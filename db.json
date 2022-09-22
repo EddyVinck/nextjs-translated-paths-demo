@@ -1,6 +1,24 @@
 {
   "paths": [
     {
+      "id": "home",
+      "data": {
+        "title": "Homepage",
+        "locale": "en",
+        "pageType": "homePage",
+        "translations": [{ "id": "thuis", "locale": "nl" }]
+      }
+    },
+    {
+      "id": "thuis",
+      "data": {
+        "title": "Startpagina",
+        "locale": "nl",
+        "pageType": "homePage",
+        "translations": [{ "id": "home", "locale": "en" }]
+      }
+    },
+    {
       "id": "about-us",
       "data": {
         "title": "About us",

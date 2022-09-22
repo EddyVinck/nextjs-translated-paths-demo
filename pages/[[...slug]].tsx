@@ -11,11 +11,13 @@ import {
   AboutPage,
   CategoryOverviewPage,
   CategoryPage,
+  HomePage,
   ProductPage,
   SubCategoryPage,
 } from "../components/templates";
 
 type PageType =
+  | "homePage"
   | "aboutPage"
   | "categoryOverviewPage"
   | "categoryPage"
@@ -23,6 +25,7 @@ type PageType =
   | "productPage";
 
 const pageMap: Record<PageType, () => JSX.Element> = {
+  homePage: HomePage,
   aboutPage: AboutPage,
   categoryPage: CategoryPage,
   subCategoryPage: SubCategoryPage,
@@ -34,7 +37,20 @@ function idToSlugPieces(id: string): string[] {
   return id.split("_");
 }
 
-function slugPiecesToId(slugPieces: string[]) {
+function slugPiecesToId(slugPieces: string[], locale: string) {
+  if (!slugPieces?.length) {
+    if (locale === "nl") {
+      return "thuis";
+    } else if (locale === "en") {
+      return "home";
+    } else {
+      throw new Error(
+        `Something went wrong trying to get an id for locale of "${locale}" and these slugPieces: ${JSON.stringify(
+          slugPieces
+        )}`
+      );
+    }
+  }
   return slugPieces.join("_");
 }
 
@@ -42,20 +58,28 @@ function slugPiecesToPath(slugPieces: string[]): string {
   return slugPieces.join("/");
 }
 
-function normalizePathParams(
-  paths: Array<{
-    id: string;
-    data: { params: Record<string, any>; [k: string]: any };
-  }>
-): GetStaticPathsResult["paths"] {
+function slugResolver(slugPieces: string[], pageType: PageType) {
+  let newSlugPieces = slugPieces;
+  if (pageType === "homePage") {
+    newSlugPieces = []; // homepage
+  }
+  return newSlugPieces;
+}
+
+function normalizePathParams(paths: Page[]): GetStaticPathsResult["paths"] {
   // format the data so it can be returned by getStaticPaths
   return paths.map((path) => {
-    const { id } = path;
+    const {
+      id,
+      data: { pageType, locale },
+    } = path;
+
     const slugPieces = idToSlugPieces(id);
+    let slug = slugResolver(slugPieces, pageType);
 
     // You can only pass `slug` here because the file is called `[[...slug]].tsx`.
     // Unfortunately it's not possible to pass any other data, you have to fetch it again in `getStaticProps`
-    return { params: { slug: slugPieces } };
+    return { params: { slug }, locale };
   });
 }
 
@@ -68,7 +92,7 @@ export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
   }
 
   const pathsReq = await fetch("http://localhost:5001/paths");
-  const pathsData = await pathsReq.json();
+  const pathsData: Page[] = await pathsReq.json();
   const paths = normalizePathParams(pathsData);
 
   return {
@@ -90,13 +114,15 @@ type Page = {
 export const getStaticProps: GetStaticProps = async (context) => {
   const { locale } = context;
 
-  const id = slugPiecesToId(context.params!.slug as string[]);
-  const pageReq = await fetch(`http://localhost:5001/paths/${id}`);
+  const id = slugPiecesToId(context.params?.slug as string[], locale as string);
+  const pageIdEndpoint = `http://localhost:5001/paths/${id}`;
+  const pageReq = await fetch(pageIdEndpoint);
   const page: Page = await pageReq.json();
 
   const pageTranslations = page.data.translations.map(({ id, locale }) => {
     const slugPieces = idToSlugPieces(id);
-    const path = slugPiecesToPath(slugPieces);
+    const resolvedSlugPieces = slugResolver(slugPieces, page.data.pageType);
+    const path = slugPiecesToPath(resolvedSlugPieces);
     return {
       href: `http://localhost:3000/${path}`,
       locale,
@@ -105,15 +131,18 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   const allPagesReq = await fetch("http://localhost:5001/paths");
   const allPages: Page[] = await allPagesReq.json();
-  const navigation = allPages.map(({ id, data: { title, locale } }) => {
-    const slugPieces = idToSlugPieces(id);
-    const path = slugPiecesToPath(slugPieces);
-    return {
-      text: title,
-      href: `http://localhost:3000/${path}`,
-      locale: locale,
-    };
-  });
+  const navigation = allPages.map(
+    ({ id, data: { title, pageType, locale } }) => {
+      const slugPieces = idToSlugPieces(id);
+      const resolvedSlugPieces = slugResolver(slugPieces, pageType);
+      const path = slugPiecesToPath(resolvedSlugPieces);
+      return {
+        text: title,
+        href: `http://localhost:3000/${path}`,
+        locale: locale,
+      };
+    }
+  );
 
   return {
     props: { page, locale, translations: pageTranslations, navigation },
@@ -153,9 +182,9 @@ const MyDyanmicPage: NextPage<{
           <ul>
             {navigation
               ?.filter((link) => link.locale === locale)
-              .map(({ href, text }) => (
+              .map(({ href, text, locale }) => (
                 <li key={href}>
-                  <Link href={href} passHref>
+                  <Link href={href} passHref locale={locale}>
                     <a>{text}</a>
                   </Link>
                 </li>

@@ -12,6 +12,14 @@ npm run dev:mocks
 npm run dev
 ```
 
+And then open http://localhost:3000
+
+## Why this demo?
+
+Internationalized routing in NextJS is confusing. This demo serves as an example.
+
+It uses `json-server` as a mock database, and therefore I have written some code to work around it and use it as a "CMS". It's not meant to be pretty, but this results in some code you probably wouldn't need when using a CMS.
+
 This demo is an implementation of the solution suggested here: https://github.com/vercel/next.js/discussions/18485#discussioncomment-2955023
 
 > For people only using an optional catch all route and for dynamic pages in general, this is fairly easy to implement using the default i18n integration.
