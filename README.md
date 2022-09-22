@@ -1,3 +1,5 @@
+![demo gif](./demo.gif)
+
 # NextJS Demo with fully translated paths
 
 See the discussion here: https://github.com/vercel/next.js/discussions/18485#discussioncomment-2847338
@@ -13,6 +15,8 @@ npm run dev
 ```
 
 And then open http://localhost:3000
+
+Important note: this was not made to be deployed
 
 ## Why this demo?
 
