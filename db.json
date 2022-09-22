@@ -1,0 +1,98 @@
+{
+  "paths": [
+    {
+      "id": "about-us",
+      "data": {
+        "title": "About us",
+        "locale": "en",
+        "pageType": "aboutPage",
+        "translations": [{ "id": "over-ons", "locale": "nl" }]
+      }
+    },
+    {
+      "id": "over-ons",
+      "data": {
+        "title": "Over ons",
+        "locale": "nl",
+        "pageType": "aboutPage",
+        "translations": [{ "id": "about-us", "locale": "en" }]
+      }
+    },
+    {
+      "id": "category",
+      "data": {
+        "title": "Category overview",
+        "locale": "en",
+        "pageType": "categoryOverviewPage",
+        "translations": [{ "id": "categorie", "locale": "nl" }]
+      }
+    },
+    {
+      "id": "categorie",
+      "data": {
+        "title": "Categorie overzicht",
+        "locale": "nl",
+        "pageType": "categoryOverviewPage",
+        "translations": [{ "id": "category", "locale": "en" }]
+      }
+    },
+    {
+      "id": "category_furniture",
+      "data": {
+        "title": "Furniture category",
+        "locale": "en",
+        "pageType": "categoryPage",
+        "translations": [{ "id": "categorie_meubels", "locale": "nl" }]
+      }
+    },
+    {
+      "id": "categorie_meubels",
+      "data": {
+        "title": "Meubels categorie",
+        "locale": "nl",
+        "pageType": "categoryPage",
+        "translations": [{ "id": "category_furniture", "locale": "en" }]
+      }
+    },
+    {
+      "id": "category_furniture_chairs",
+      "data": {
+        "title": "Chairs category",
+        "locale": "en",
+        "pageType": "subCategoryPage",
+        "translations": [{ "id": "categorie_meubels_stoelen", "locale": "nl" }]
+      }
+    },
+    {
+      "id": "categorie_meubels_stoelen",
+      "data": {
+        "title": "Stoelen categorie",
+        "locale": "nl",
+        "pageType": "subCategoryPage",
+        "translations": [{ "id": "category_furniture_chairs", "locale": "en" }]
+      }
+    },
+    {
+      "id": "category_furniture_chairs_a-nice-chair",
+      "data": {
+        "title": "A nice chair",
+        "locale": "en",
+        "pageType": "productPage",
+        "translations": [
+          { "id": "categorie_meubels_stoelen_een-fijne-stoel", "locale": "nl" }
+        ]
+      }
+    },
+    {
+      "id": "categorie_meubels_stoelen_een-fijne-stoel",
+      "data": {
+        "title": "Een fijne stoel",
+        "locale": "nl",
+        "pageType": "productPage",
+        "translations": [
+          { "id": "category_furniture_chairs_a-nice-chair", "locale": "en" }
+        ]
+      }
+    }
+  ]
+}

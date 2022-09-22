@@ -1,34 +1,66 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# NextJS Demo with fully translated paths
 
-## Getting Started
+See the discussion here: https://github.com/vercel/next.js/discussions/18485#discussioncomment-2847338
 
-First, run the development server:
+To start:
 
 ```bash
+# In one terminal
+npm run dev:mocks
+
+# In another terminal
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This demo is an implementation of the solution suggested here: https://github.com/vercel/next.js/discussions/18485#discussioncomment-2955023
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+> For people only using an optional catch all route and for dynamic pages in general, this is fairly easy to implement using the default i18n integration.
+>
+> We use the following approach for an application connected to a headless CMS using said [[...slug]].tsx to handle all pages.
+>
+> In that case, you'll only have to return your paths providing the correct locale:
+>
+> ```
+> export const getStaticPaths: GetStaticPaths = async ({ locales }) => {
+>     if (!locales) {
+>         throw new Error("Couldn't find locales.");
+>     }
+>
+>     const pages = await Promise.all(locales.map(getAllPages));
+>    const paths = normalizePathParams(pages.flat());
+>    const paths = normalizePathParams(pages.flat());
+>
+>    // [
+>    //     { params: { slug: ["about"] }, locale: "en" },
+>    //     { params: { slug: ["ueber-uns"] }, locale: "de" },
+>    // ]
+>
+>    return {
+>        paths,
+>        fallback: "blocking",
+>    };
+> };
+> ```
+>
+> And within getStaticProps get the correct page data by using the slug and the current locale from the context.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Relevant NextJS documentation
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- [i18n routing](https://nextjs.org/docs/advanced-features/i18n-routing#getting-started)
+- [Optional catch all routes](https://nextjs.org/docs/routing/dynamic-routes#optional-catch-all-routes)
+- [Middleware](https://nextjs.org/docs/advanced-features/middleware)
+- [SEO: You need to add `hreflang` yourself](https://nextjs.org/docs/advanced-features/i18n-routing#search-engine-optimization)
 
-## Learn More
+## Caveats
 
-To learn more about Next.js, take a look at the following resources:
+Had to remove index.tsx
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+Error: You cannot define a route with the same specificity as a optional catch-all route ("/" and "/[[...slug]]").
+    at UrlNode._smoosh (nextjs-translated-full-paths/node_modules/next/dist/shared/lib/router/utils/sorted-routes.js:36:23)
+    at UrlNode.smoosh (nextjs-translated-full-paths/node_modules/next/dist/shared/lib/router/utils/sorted-routes.js:11:21)
+    at Object.getSortedRoutes (nextjs-translated-full-paths/node_modules/next/dist/shared/lib/router/utils/sorted-routes.js:161:17)
+    at Watchpack.<anonymous> (nextjs-translated-full-paths/node_modules/next/dist/server/dev/next-dev-server.js:422:55)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+[You unfortunately cannot pass additional data from `getStaticPaths` to `getStaticProps`](https://github.com/vercel/next.js/discussions/11272). There is [a workaround using a file sytem cache](https://github.com/vercel/next.js/discussions/11272#discussioncomment-2257876), but it seems far from ideal.
